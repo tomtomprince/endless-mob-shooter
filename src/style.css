@@ -1,0 +1,16 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #0a0a0a;
+  overflow: hidden;
+}
+
+#app {
+  height: 100%;
+}
+
+#app canvas {
+  image-rendering: pixelated;
+}

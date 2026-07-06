@@ -1,0 +1,262 @@
+{
+  "play": {
+    "frameWidth": 39,
+    "frameHeight": 59,
+    "originX": 0.48717948717948717,
+    "originY": 0.9152542372881356,
+    "anims": {
+      "walk": {
+        "start": 0,
+        "end": 3
+      },
+      "death": {
+        "start": 4,
+        "end": 10
+      }
+    }
+  },
+  "poss": {
+    "frameWidth": 51,
+    "frameHeight": 57,
+    "originX": 0.5098039215686274,
+    "originY": 0.9298245614035088,
+    "anims": {
+      "walk": {
+        "start": 0,
+        "end": 3
+      },
+      "death": {
+        "start": 4,
+        "end": 8
+      }
+    }
+  },
+  "troo": {
+    "frameWidth": 71,
+    "frameHeight": 64,
+    "originX": 0.5211267605633803,
+    "originY": 0.9375,
+    "anims": {
+      "walk": {
+        "start": 0,
+        "end": 3
+      },
+      "attack": {
+        "start": 4,
+        "end": 6
+      },
+      "death": {
+        "start": 7,
+        "end": 11
+      }
+    }
+  },
+  "sarg": {
+    "frameWidth": 49,
+    "frameHeight": 61,
+    "originX": 0.4489795918367347,
+    "originY": 0.9180327868852459,
+    "anims": {
+      "walk": {
+        "start": 0,
+        "end": 3
+      },
+      "death": {
+        "start": 4,
+        "end": 9
+      }
+    }
+  },
+  "cpos": {
+    "frameWidth": 53,
+    "frameHeight": 61,
+    "originX": 0.33962264150943394,
+    "originY": 0.9180327868852459,
+    "anims": {
+      "walk": {
+        "start": 0,
+        "end": 3
+      },
+      "death": {
+        "start": 4,
+        "end": 10
+      }
+    }
+  },
+  "head": {
+    "frameWidth": 96,
+    "frameHeight": 77,
+    "originX": 0.5208333333333334,
+    "originY": 0.8961038961038961,
+    "anims": {
+      "walk": {
+        "start": 0,
+        "end": 0
+      },
+      "attack": {
+        "start": 1,
+        "end": 3
+      },
+      "death": {
+        "start": 4,
+        "end": 9
+      }
+    }
+  },
+  "skel": {
+    "frameWidth": 65,
+    "frameHeight": 67,
+    "originX": 0.49230769230769234,
+    "originY": 0.9402985074626866,
+    "anims": {
+      "walk": {
+        "start": 0,
+        "end": 3
+      },
+      "attack": {
+        "start": 4,
+        "end": 5
+      },
+      "death": {
+        "start": 6,
+        "end": 10
+      }
+    }
+  },
+  "fatt": {
+    "frameWidth": 103,
+    "frameHeight": 80,
+    "originX": 0.4854368932038835,
+    "originY": 0.9375,
+    "anims": {
+      "walk": {
+        "start": 0,
+        "end": 3
+      },
+      "attack": {
+        "start": 4,
+        "end": 5
+      },
+      "death": {
+        "start": 6,
+        "end": 15
+      }
+    }
+  },
+  "boss": {
+    "frameWidth": 92,
+    "frameHeight": 76,
+    "originX": 0.5217391304347826,
+    "originY": 0.9473684210526315,
+    "anims": {
+      "walk": {
+        "start": 0,
+        "end": 3
+      },
+      "death": {
+        "start": 4,
+        "end": 10
+      }
+    }
+  },
+  "cybr": {
+    "frameWidth": 113,
+    "frameHeight": 111,
+    "originX": 0.49557522123893805,
+    "originY": 0.918918918918919,
+    "anims": {
+      "walk": {
+        "start": 0,
+        "end": 3
+      },
+      "attack": {
+        "start": 4,
+        "end": 5
+      },
+      "death": {
+        "start": 6,
+        "end": 14
+      }
+    }
+  },
+  "proj_bal1": {
+    "frameWidth": 46,
+    "frameHeight": 40,
+    "originX": 0.4782608695652174,
+    "originY": 0.7,
+    "anims": {
+      "fly": {
+        "start": 0,
+        "end": 1
+      },
+      "boom": {
+        "start": 2,
+        "end": 4
+      }
+    }
+  },
+  "proj_bal2": {
+    "frameWidth": 49,
+    "frameHeight": 44,
+    "originX": 0.5102040816326531,
+    "originY": 0.7727272727272727,
+    "anims": {
+      "fly": {
+        "start": 0,
+        "end": 1
+      },
+      "boom": {
+        "start": 2,
+        "end": 4
+      }
+    }
+  },
+  "proj_fatb": {
+    "frameWidth": 41,
+    "frameHeight": 42,
+    "originX": 0.4634146341463415,
+    "originY": 0.7619047619047619,
+    "anims": {
+      "fly": {
+        "start": 0,
+        "end": 1
+      },
+      "boom": {
+        "start": 2,
+        "end": 4
+      }
+    }
+  },
+  "proj_manf": {
+    "frameWidth": 91,
+    "frameHeight": 69,
+    "originX": 0.4945054945054945,
+    "originY": 0.6811594202898551,
+    "anims": {
+      "fly": {
+        "start": 0,
+        "end": 1
+      },
+      "boom": {
+        "start": 2,
+        "end": 4
+      }
+    }
+  },
+  "proj_misl": {
+    "frameWidth": 91,
+    "frameHeight": 69,
+    "originX": 0.4945054945054945,
+    "originY": 0.6811594202898551,
+    "anims": {
+      "fly": {
+        "start": 0,
+        "end": 0
+      },
+      "boom": {
+        "start": 1,
+        "end": 3
+      }
+    }
+  }
+}
