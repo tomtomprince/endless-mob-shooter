@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { SPRITES } from "./BootScene";
-import { buildWave, type MobDef } from "./mobs";
+import { buildWave, waveScore, type MobDef } from "./mobs";
 import { LEVELS, levelForWave, type GateKind, type LevelDef } from "./levels";
 
 export const W = 540;
@@ -20,6 +20,9 @@ const BASE_HP = 20;
 const CHARGE_MAX = 40; // cannon shots to charge a giant
 const GIANT_HP = 12;
 const GIANT_SPEED = 120;
+const NUKE_START = 0;
+const NUKE_MAX = 3;
+const NUKE_REGEN_WAVES = 1.5; // ~1.5 waves' worth of score buys a nuke
 
 interface Gate {
   id: number;
@@ -87,6 +90,8 @@ export class GameScene extends Phaser.Scene {
   private pods: Pod[] = [];
   private projs: Proj[] = [];
   private charge = 0;
+  private nukes = NUKE_START;
+  private nextNukeScore = 0;
   private spawnQueue: { at: number; def: MobDef }[] = [];
 
   private cannon!: Phaser.GameObjects.Container;
@@ -105,6 +110,8 @@ export class GameScene extends Phaser.Scene {
   private hpBar!: Phaser.GameObjects.Rectangle;
   private chargeBar!: Phaser.GameObjects.Rectangle;
   private chargeText!: Phaser.GameObjects.Text;
+  private nukeBtn!: Phaser.GameObjects.Rectangle;
+  private nukeText!: Phaser.GameObjects.Text;
   private hpText!: Phaser.GameObjects.Text;
   private scoreText!: Phaser.GameObjects.Text;
   private waveText!: Phaser.GameObjects.Text;
@@ -125,8 +132,10 @@ export class GameScene extends Phaser.Scene {
     this.pods = [];
     this.projs = [];
     this.charge = 0;
+    this.nukes = NUKE_START;
     this.spawnQueue = [];
     this.wave = Number(params.get("wave") ?? 1) - 1;
+    this.nextNukeScore = waveScore(this.wave + 1) * NUKE_REGEN_WAVES;
     this.levelIndex = -1;
     this.score = 0;
     this.baseHp = Number(params.get("hp") ?? BASE_HP);
@@ -148,6 +157,8 @@ export class GameScene extends Phaser.Scene {
     this.input.on("pointerdown", (p: Phaser.Input.Pointer) => {
       this.targetX = p.worldX;
     });
+    this.input.keyboard?.on("keydown-SPACE", () => this.detonateNuke());
+    this.input.keyboard?.on("keydown-N", () => this.detonateNuke());
   }
 
   // ------------------------------------------------------------- setup
@@ -322,20 +333,23 @@ export class GameScene extends Phaser.Scene {
       scale: { from: 1.25, to: 1 },
       duration: 120,
     });
-    if (p.hp <= 0) {
-      const i = this.pods.indexOf(p);
-      if (i >= 0) this.pods.splice(i, 1);
-      const flash = this.add.circle(p.x, p.y, 30, 0xffcc33, 0.8).setDepth(1200);
-      this.tweens.add({
-        targets: flash,
-        alpha: 0,
-        scale: 3,
-        duration: 400,
-        onComplete: () => flash.destroy(),
-      });
-      this.removePodVisual(p);
-      this.grantUpgrade();
-    }
+    if (p.hp <= 0) this.popPod(p);
+  }
+
+  /** Burst a pod open and collect its upgrade. */
+  private popPod(p: Pod) {
+    const i = this.pods.indexOf(p);
+    if (i >= 0) this.pods.splice(i, 1);
+    const flash = this.add.circle(p.x, p.y, 30, 0xffcc33, 0.8).setDepth(1200);
+    this.tweens.add({
+      targets: flash,
+      alpha: 0,
+      scale: 3,
+      duration: 400,
+      onComplete: () => flash.destroy(),
+    });
+    this.removePodVisual(p);
+    this.grantUpgrade();
   }
 
   private grantUpgrade() {
@@ -501,6 +515,29 @@ export class GameScene extends Phaser.Scene {
       })
       .setOrigin(0.5, 0)
       .setDepth(1000);
+    // nuke button, bottom-left of the base strip; clicking anywhere else
+    // steers the cannon, so the detonate tap gets its own target
+    this.nukeBtn = this.add
+      .rectangle(70, H - 28, 112, 34, 0x331111, 0.9)
+      .setDepth(1000)
+      .setStrokeStyle(2, 0xff6644, 0.9)
+      .setInteractive({ useHandCursor: true });
+    this.nukeText = this.add
+      .text(70, H - 28, `NUKE x${this.nukes}`, {
+        fontFamily: "monospace",
+        fontSize: "16px",
+        fontStyle: "bold",
+        color: "#ff8866",
+      })
+      .setOrigin(0.5)
+      .setDepth(1001);
+    this.nukeBtn.on(
+      "pointerdown",
+      (_p: Phaser.Input.Pointer, _lx: number, _ly: number, event: Phaser.Types.Input.EventData) => {
+        event.stopPropagation();
+        this.detonateNuke();
+      },
+    );
     // giant charge meter, down in the base strip
     this.add
       .rectangle(W / 2, H - 28, 224, 18, 0x001122, 0.85)
@@ -683,6 +720,32 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.flash(200, 120, 0, 0);
     e.spr.destroy();
     if (this.baseHp <= 0) this.gameOver();
+  }
+
+  // ------------------------------------------------------------- nukes
+
+  /** Wipe the screen: every enemy and projectile dies, pods pop (and their
+   *  upgrades are collected). Nuke-proof mobs — the cyberdemon — ride it out. */
+  private detonateNuke() {
+    if (this.over || this.nukes <= 0) return;
+    this.nukes--;
+    this.playSound("boom", 0, 0.7);
+    this.cameras.main.shake(350, 0.02);
+    this.cameras.main.flash(350, 255, 200, 80);
+    for (let i = this.enemies.length - 1; i >= 0; i--) {
+      const e = this.enemies[i];
+      if (e.def.nukeProof) continue;
+      e.hp = 0;
+      this.killEnemy(e);
+    }
+    // in-flight fireballs fizzle without splashing marines
+    for (let i = this.projs.length - 1; i >= 0; i--) {
+      const p = this.projs[i];
+      p.splash = 0;
+      this.explodeProj(p);
+    }
+    // popPod removes from this.pods, so drain from the back
+    while (this.pods.length > 0) this.popPod(this.pods[this.pods.length - 1]);
   }
 
   // ------------------------------------------------------------- attacks
@@ -1015,11 +1078,12 @@ export class GameScene extends Phaser.Scene {
           m.hp -= 1;
           if (m.hp <= 0) this.killMarine(m);
           e.hp -= 3;
-          e.spr.y -= 420 / (e.def.power + 3);
+          if (!e.def.immovable) e.spr.y -= 420 / (e.def.power + 3);
         } else {
           this.killMarine(m);
           e.hp -= 1;
-          e.spr.y -= 220 / (e.def.power + 3); // knockback, heavies budge less
+          // knockback, heavies budge less
+          if (!e.def.immovable) e.spr.y -= 220 / (e.def.power + 3);
         }
         e.spr.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
         this.time.delayedCall(60, () => {
@@ -1048,6 +1112,28 @@ export class GameScene extends Phaser.Scene {
   }
 
   private updateHud() {
+    // nukes regenerate on a score ladder pegged to the current wave's
+    // payout, so they stay equally rare as scoring accelerates
+    while (this.score >= this.nextNukeScore) {
+      this.nextNukeScore += waveScore(Math.max(1, this.wave)) * NUKE_REGEN_WAVES;
+      if (this.nukes < NUKE_MAX) {
+        this.nukes++;
+        this.playSound("upgrade", 100, 0.5);
+        this.tweens.add({
+          targets: [this.nukeBtn, this.nukeText],
+          scale: { from: 1.25, to: 1 },
+          duration: 160,
+        });
+      }
+    }
+    this.nukeText.setText(`NUKE x${this.nukes}`);
+    if (this.nukes > 0) {
+      this.nukeText.setColor("#ff8866");
+      this.nukeBtn.setStrokeStyle(2, 0xff6644, 0.9);
+    } else {
+      this.nukeText.setColor("#665555");
+      this.nukeBtn.setStrokeStyle(2, 0x554444, 0.7);
+    }
     this.hpBar.width = 156 * Math.min(1, this.baseHp / BASE_HP);
     this.hpText.setText(`${this.baseHp}/${BASE_HP}`);
     this.scoreText.setText(`${this.score}`);
@@ -1073,6 +1159,7 @@ export class GameScene extends Phaser.Scene {
 
   private gameOver() {
     this.over = true;
+    this.nukeBtn.disableInteractive(); // don't swallow the restart tap
     this.sound.play("gameover", { volume: 0.7 });
     this.add.rectangle(W / 2, H / 2, W, H, 0x000000, 0.65).setDepth(2000);
     this.add

@@ -15,6 +15,8 @@ export interface MobDef {
   scale: number;
   unlock: number; // first wave this mob can appear in
   floats?: boolean;
+  nukeProof?: boolean; // survives the screen-clearing nuke
+  immovable?: boolean; // ignores marine knockback
   attack?: AttackDef;
 }
 
@@ -80,6 +82,8 @@ export const BOSS_MOB: MobDef = {
   power: 40,
   scale: 1.15,
   unlock: 10,
+  nukeProof: true,
+  immovable: true,
   attack: {
     proj: "misl",
     cooldown: 1800,
@@ -92,9 +96,19 @@ export const BOSS_MOB: MobDef = {
 
 export const MOB_BY_KEY = new Map([...MOBS, BOSS_MOB].map((m) => [m.key, m]));
 
+/** Power budget spent building a wave. */
+export function wavePower(wave: number): number {
+  return (10 + wave * 20) * 6;
+}
+
+/** Rough score a full wave pays out (each kill scores power*10). */
+export function waveScore(wave: number): number {
+  return wavePower(wave) * 10;
+}
+
 /** Pick the mobs for a wave, cheap-heavy mix, spending a power budget. */
 export function buildWave(wave: number, rng: () => number): MobDef[] {
-  let budget = (10 + wave * 20) * 6;
+  let budget = wavePower(wave);
   const pool = MOBS.filter((m) => m.unlock <= wave);
   const picks: MobDef[] = [];
   // hard cap per wave: excess budget buys density, not endless queues
