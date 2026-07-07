@@ -67,9 +67,22 @@ license), extracted from `freedoom2.wad`:
   ../potato-ai/.venv/bin/python tools/extract_assets.py
   ```
 
-The `tools/drive*.mjs` scripts are headless-Chrome smoke tests
-(Playwright): start `vp dev --port 5199`, then run them with `SHOT_DIR` set
-to where screenshots should go.
+## Checks
+
+- `vp check` — format, lint, and type checks.
+- `vp test` — unit tests for the pure game math (wave building, level
+  cycling; `src/*.test.ts`).
+- `vp build && node tools/smoke.mjs` — asserting boot smoke test: serves the
+  production build headless and fails unless wave 1 starts, units spawn on
+  both sides, scoring works, and the console stays clean. Set
+  `PW_CHANNEL=chrome` to use a system Chrome.
+
+CI runs all three (plus a check that `dist/FREEDOOM-LICENSE.txt` shipped)
+before deploying.
+
+The `tools/drive*.mjs` scripts are manual playtest drivers (Playwright,
+screenshots only — no assertions): start `vp dev --port 5199`, then run them
+with `SHOT_DIR` set to where screenshots should go.
 
 ## Licensing
 

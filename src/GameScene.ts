@@ -6,6 +6,13 @@ import { LEVELS, levelForWave, type GateKind, type LevelDef } from "./levels";
 export const W = 540;
 export const H = 960;
 
+declare global {
+  interface Window {
+    /** Live scene handle for headless smoke tests (see tools/smoke.mjs). */
+    __scene?: GameScene;
+  }
+}
+
 const CANNON_Y = 855;
 const BASE_Y = 830; // enemies crossing this line damage the base
 const GATE_HALF_W = 82;
@@ -124,6 +131,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
+    window.__scene = this;
     // debug/tuning helpers: ?wave=9 starts at wave 9, ?hp=3 weakens the base
     const params = new URLSearchParams(location.search);
     this.marines = [];
