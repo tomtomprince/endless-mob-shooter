@@ -28,7 +28,9 @@ the bottom — when full, the next shot is a giant marine that trades 3 damage
 per hit, shrugs off fireballs, and punches straight through crate walls.
 
 Scoring also earns **nukes** — one per ~1.5 waves' worth of points, stocking
-up to three. Click the NUKE button (or press Space/N) to wipe every enemy
+up to three; the button fills to show progress toward the next one and the
+game flashes NUKE READY when it lands. Click the NUKE button (or press
+Space/N) to wipe every enemy
 and projectile on screen; upgrade pods caught in the blast pop too, and
 their upgrades are collected. Only the cyberdemon shrugs a nuke off (it
 ignores knockback, too).

@@ -91,6 +91,7 @@ export class GameScene extends Phaser.Scene {
   private projs: Proj[] = [];
   private charge = 0;
   private nukes = NUKE_START;
+  private nukeFrom = 0; // score the current regen step started at
   private nextNukeScore = 0;
   private spawnQueue: { at: number; def: MobDef }[] = [];
 
@@ -111,6 +112,7 @@ export class GameScene extends Phaser.Scene {
   private chargeBar!: Phaser.GameObjects.Rectangle;
   private chargeText!: Phaser.GameObjects.Text;
   private nukeBtn!: Phaser.GameObjects.Rectangle;
+  private nukeFill!: Phaser.GameObjects.Rectangle;
   private nukeText!: Phaser.GameObjects.Text;
   private hpText!: Phaser.GameObjects.Text;
   private scoreText!: Phaser.GameObjects.Text;
@@ -135,6 +137,7 @@ export class GameScene extends Phaser.Scene {
     this.nukes = NUKE_START;
     this.spawnQueue = [];
     this.wave = Number(params.get("wave") ?? 1) - 1;
+    this.nukeFrom = 0;
     this.nextNukeScore = waveScore(this.wave + 1) * NUKE_REGEN_WAVES;
     this.levelIndex = -1;
     this.score = 0;
@@ -527,6 +530,11 @@ export class GameScene extends Phaser.Scene {
       .setDepth(1000)
       .setStrokeStyle(2, 0xff6644, 0.9)
       .setInteractive({ useHandCursor: true });
+    // the button doubles as a progress meter toward the next nuke
+    this.nukeFill = this.add
+      .rectangle(70 - 54, H - 28, 0, 30, 0x7a2b1c, 0.9)
+      .setOrigin(0, 0.5)
+      .setDepth(1000);
     this.nukeText = this.add
       .text(70, H - 28, `NUKE x${this.nukes}`, {
         fontFamily: "monospace",
@@ -1120,10 +1128,12 @@ export class GameScene extends Phaser.Scene {
     // nukes regenerate on a score ladder pegged to the current wave's
     // payout, so they stay equally rare as scoring accelerates
     while (this.score >= this.nextNukeScore) {
+      this.nukeFrom = this.nextNukeScore;
       this.nextNukeScore += waveScore(Math.max(1, this.wave)) * NUKE_REGEN_WAVES;
       if (this.nukes < NUKE_MAX) {
         this.nukes++;
         this.playSound("upgrade", 100, 0.5);
+        this.showBanner("NUKE READY", "#ff7755");
         this.tweens.add({
           targets: [this.nukeBtn, this.nukeText],
           scale: { from: 1.25, to: 1 },
@@ -1131,6 +1141,15 @@ export class GameScene extends Phaser.Scene {
         });
       }
     }
+    const nukeFrac =
+      this.nukes >= NUKE_MAX
+        ? 1
+        : Phaser.Math.Clamp(
+            (this.score - this.nukeFrom) / (this.nextNukeScore - this.nukeFrom),
+            0,
+            1,
+          );
+    this.nukeFill.width = 108 * nukeFrac;
     this.nukeText.setText(`NUKE x${this.nukes}`);
     if (this.nukes > 0) {
       this.nukeText.setColor("#ff8866");
