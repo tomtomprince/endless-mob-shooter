@@ -18,6 +18,16 @@ export interface MobDef {
   attack?: AttackDef;
 }
 
+// Sprite key -> Doom monster / Freedoom equivalent:
+//   poss  Zombieman (former human)  / Zombie
+//   troo  Imp                       / Serpentipede
+//   sarg  Demon ("pinky")           / Flesh Worm
+//   cpos  Chaingunner               / Minigun Zombie
+//   head  Cacodemon                 / Trilobite
+//   skel  Revenant                  / Dark Soldier
+//   fatt  Mancubus                  / Combat Slug
+//   boss  Baron of Hell             / Pain Lord
+//   cybr  Cyberdemon                / Assault Tripod
 export const MOBS: MobDef[] = [
   { key: "poss", hp: 1, speed: 66, power: 1, scale: 0.75, unlock: 1 },
   {
@@ -29,7 +39,7 @@ export const MOBS: MobDef[] = [
     unlock: 2,
     attack: { proj: "bal1", cooldown: 3150, speed: 220 },
   },
-  { key: "sarg", hp: 3, speed: 114, power: 2, scale: 0.8, unlock: 4 },
+  { key: "sarg", hp: 3, speed: 90, power: 2, scale: 0.8, unlock: 4 },
   { key: "cpos", hp: 4, speed: 54, power: 3, scale: 0.8, unlock: 6 },
   {
     key: "head",
