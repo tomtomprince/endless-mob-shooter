@@ -42,6 +42,8 @@ vp dev
 
 Production build: `vp build`, then `vp preview`.
 
+Escape pauses (Escape or tap resumes).
+
 Debug/tuning URL params: `?wave=10` starts at wave 10, `?hp=3` weakens the
 base.
 

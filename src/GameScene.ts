@@ -159,6 +159,11 @@ export class GameScene extends Phaser.Scene {
     });
     this.input.keyboard?.on("keydown-SPACE", () => this.detonateNuke());
     this.input.keyboard?.on("keydown-N", () => this.detonateNuke());
+    this.input.keyboard?.on("keydown-ESC", () => {
+      if (this.over) return;
+      this.scene.launch("pause");
+      this.scene.pause();
+    });
   }
 
   // ------------------------------------------------------------- setup
