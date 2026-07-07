@@ -29,6 +29,7 @@ jobs:
       - name: Freedoom license must ship with the build
         run: test -f dist/FREEDOOM-LICENSE.txt
       - name: Boot smoke test
+        timeout-minutes: 10
         run: |
           vp exec playwright install --with-deps chromium
           node tools/smoke.mjs

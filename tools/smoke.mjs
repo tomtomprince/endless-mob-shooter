@@ -13,8 +13,11 @@ const PORT = 4199;
 const failures = [];
 const consoleErrors = [];
 
+// detached: vp spawns vite as a grandchild; killing the group is the only
+// way to make sure nothing keeps the port (or our stdio pipes) alive
 const server = spawn("vp", ["preview", "--port", String(PORT), "--strictPort"], {
   stdio: ["ignore", "pipe", "pipe"],
+  detached: true,
 });
 try {
   let up = false;
@@ -80,7 +83,11 @@ try {
   }
   await browser.close();
 } finally {
-  server.kill();
+  try {
+    process.kill(-server.pid, "SIGTERM");
+  } catch {
+    server.kill();
+  }
 }
 
 if (failures.length > 0) {
@@ -88,3 +95,5 @@ if (failures.length > 0) {
   process.exit(1);
 }
 console.log("\nsmoke test passed");
+// exit explicitly: surviving grandchild pipes must not keep node alive
+process.exit(0);
